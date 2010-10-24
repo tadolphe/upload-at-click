@@ -1,4 +1,3 @@
-// FIXME add MAX_FILE_SIZE support
 upload_at_click_listen_frames = new Array();
 
 function upload_at_click(element, action, params, oncomplete, doc)
@@ -201,6 +200,12 @@ function upload_at_click(element, action, params, oncomplete, doc)
     var change_callback =
         function(e)
         {
+            // empty filename check
+            if (!input.value)
+            {
+                return;
+            }
+
             // Get event details for IE
             if (typeof e === 'undefined')
                 e = window.event;
@@ -278,7 +283,6 @@ function upload_at_click_get_window_handle(iframe)
 }
 
 
-// FIXME test for 2 iframe
 function upload_at_click_timer()
 {
     for(var i=0; i<upload_at_click_listen_frames.length; i++)
