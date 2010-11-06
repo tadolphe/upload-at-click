@@ -57,6 +57,7 @@ function upclick(params)
             container.appendChild(form);
             form.method = 'post';
             form.enctype = 'multipart/form-data';
+            form.encoding = 'multipart/form-data';
             form.target = frame_name;
             form.setAttribute('target', frame_name);
             form.action = params['action'];
@@ -71,7 +72,7 @@ function upclick(params)
                 var hidden = doc.createElement("input");
                 hidden.type = "hidden";
                 hidden.name = key;
-                hidden.value = action_params[key];
+                hidden.value = String(action_params[key]);
                 form.appendChild(hidden);
             }
 
@@ -81,7 +82,7 @@ function upclick(params)
                 var input_ms = doc.createElement('input');
                 input_ms.type = 'hidden';
                 input_ms.name = 'MAX_FILE_SIZE';
-                input_ms.value = params['maxsize'];
+                input_ms.value = String(params['maxsize']);
                 form.appendChild(input_ms);
             }
 
@@ -127,6 +128,7 @@ function upclick(params)
                 input.addEventListener ('change', onchange_callback, false);
             // IE 5+
             else if (input.attachEvent)
+            {
                 input.attachEvent(
                     'onpropertychange',
                     function(e)
@@ -139,6 +141,7 @@ function upclick(params)
                             onchange_callback();
                     }
                     );
+            }
             // IE 4
             else
                 input.onpropertychange = onchange_callback;
