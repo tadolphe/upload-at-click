@@ -79,10 +79,10 @@ function upclick(params)
             if (params['maxsize'])
             {
                 var input_ms = doc.createElement('input');
-                form.appendChild(input_ms);
                 input_ms.type = 'hidden';
                 input_ms.name = 'MAX_FILE_SIZE';
                 input_ms.value = params['maxsize'];
+                form.appendChild(input_ms);
             }
 
             // input -> form
