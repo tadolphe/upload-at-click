@@ -5,6 +5,7 @@
  *      element:        DOM object
  *      action:         Server script who receive file
  *      action_params:  Server script parameters. Array: key=value
+ *      maxsize:        Maximum file size (in Bytes). 0 - unlimited
  *      onstart:        Callback function
  *                        onstart(filename).
  *                        Emited when file started upload
@@ -20,6 +21,7 @@ function upclick(params)
             element: null,
             action: 'about:blank',
             action_params: {},
+            maxsize: 0,
             onstart: null,
             oncomplete: null
         };
@@ -73,14 +75,15 @@ function upclick(params)
                 form.appendChild(hidden);
             }
 
-            // FIXME add MAX_FILESIZE support
-            /*
-            var input_ms = doc.createElement('input');
-            form.appendChild(input_ms);
-            input_ms.type = 'hidden';
-            input_ms.name = 'MAX_FILE_SIZE';
-            input_ms.value = max_size;
-            */
+            // MAX_FILESIZE. Maximum file size
+            if (params['maxsize'])
+            {
+                var input_ms = doc.createElement('input');
+                form.appendChild(input_ms);
+                input_ms.type = 'hidden';
+                input_ms.name = 'MAX_FILE_SIZE';
+                input_ms.value = params['maxsize'];
+            }
 
             // input -> form
             input = doc.createElement("input");
@@ -274,11 +277,32 @@ function upclick(params)
             var y = coords[1];
 
             // Get event details for IE
+            var scrOfX = 0, scrOfY = 0;
             if (!e)
                 e = window.event;
 
-            input.style.left = e.clientX - x - 60 + 'px';
-            input.style.top = e.clientY - y - 40 + 'px';
+            // Get scroll position
+            if( typeof( window.pageYOffset ) == 'number' )
+            {
+                //Netscape compliant
+                scrOfY = window.pageYOffset;
+                scrOfX = window.pageXOffset;
+            }
+            else if( document.body && ( document.body.scrollLeft || document.body.scrollTop ) )
+            {
+                //DOM compliant
+                scrOfY = document.body.scrollTop;
+                scrOfX = document.body.scrollLeft;
+            }
+            else if( document.documentElement && ( document.documentElement.scrollLeft || document.documentElement.scrollTop ) )
+            {
+                //IE6 standards compliant mode
+                scrOfY = document.documentElement.scrollTop;
+                scrOfX = document.documentElement.scrollLeft;
+            }
+
+            input.style.left = scrOfX + e.clientX - x - 60 + 'px';
+            input.style.top = scrOfY + e.clientY - y - 40 + 'px';
         };
 
     // bind mousemove callback (for place button under cursor)
