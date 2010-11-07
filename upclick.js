@@ -182,7 +182,7 @@ function upclick(params)
                 {
                     var curleft = 0;
                     var curtop = 0;
-                    var obj = this.parentNode;
+                    var obj = element.parentNode;
 
                     if (obj.offsetParent)
                     {
@@ -218,30 +218,13 @@ function upclick(params)
     // IE
     if (element.currentStyle && !doc.defaultView)
     {
-        // Put in event queue. Wait for element to have width and height
-        window.setTimeout(
-            function()
-            {
-                var style = element.currentStyle;
-                container.style.marginTop = style.marginTop;
-                container.style.marginRight = style.marginRight;
-                container.style.marginBottom = style.marginBottom;
-                container.style.marginLeft = style.marginLeft;
-                container.style.width = element.offsetWidth;
-                container.style.height = element.offsetHeight;
-                /*
-                container.style.height =
-                    element.offsetHeight +
-                    parseInt(style.borderTopWidth) +
-                    parseInt(style.borderBottomWidth) +
-                    'px';
-                container.style.width =
-                    element.offsetWidth +
-                    parseInt(style.borderLeftWidth) +
-                    parseInt(style.borderRightWidth) +
-                    'px';
-                */
-            }, 0);
+        var style = element.currentStyle;
+        container.style.marginTop = style.marginTop;
+        container.style.marginRight = style.marginRight;
+        container.style.marginBottom = style.marginBottom;
+        container.style.marginLeft = style.marginLeft;
+        container.style.width = element.offsetWidth;
+        container.style.height = element.offsetHeight;
     }
     // Opera, FF, Chrome
     else
@@ -280,32 +263,19 @@ function upclick(params)
             var y = coords[1];
 
             // Get event details for IE
-            var scrOfX = 0, scrOfY = 0;
             if (!e)
                 e = window.event;
 
-            // Get scroll position
-            if( typeof( window.pageYOffset ) == 'number' )
+            if (e.pageX)
             {
-                //Netscape compliant
-                scrOfY = window.pageYOffset;
-                scrOfX = window.pageXOffset;
+                input.style.left = e.pageX - x - 60 + 'px';
+                input.style.top = e.pageY - y - 40 + 'px';
             }
-            else if( document.body && ( document.body.scrollLeft || document.body.scrollTop ) )
+            else
             {
-                //DOM compliant
-                scrOfY = document.body.scrollTop;
-                scrOfX = document.body.scrollLeft;
+                input.style.left = e.x - 60 + 'px';
+                input.style.top = e.y - 40 + 'px';
             }
-            else if( document.documentElement && ( document.documentElement.scrollLeft || document.documentElement.scrollTop ) )
-            {
-                //IE6 standards compliant mode
-                scrOfY = document.documentElement.scrollTop;
-                scrOfX = document.documentElement.scrollLeft;
-            }
-
-            input.style.left = scrOfX + e.clientX - x - 60 + 'px';
-            input.style.top = scrOfY + e.clientY - y - 40 + 'px';
         };
 
     // bind mousemove callback (for place button under cursor)
