@@ -159,12 +159,6 @@ function upclick(params)
                     // NN6, Konqueror
                     else if (iframe.contentDocument)
                         ifwin = frame.contentDocument.defaultView;
-                    // IE5
-                    else if (frame.document)
-                    {
-                        var frame2 = window.frames[iframe.name];
-                        win = frame2.document.parentWindow;
-                    }
 
                     // Run 'oncomplete' callback
                     var data = ifwin.document.body.innerHTML;
@@ -199,6 +193,7 @@ function upclick(params)
                 }
         };
 
+    // frame style
     frame.style.display = 'none';
     frame.width = 0;
     frame.height = 0;
@@ -223,8 +218,15 @@ function upclick(params)
         container.style.marginRight = style.marginRight;
         container.style.marginBottom = style.marginBottom;
         container.style.marginLeft = style.marginLeft;
-        container.style.width = element.offsetWidth;
-        container.style.height = element.offsetHeight;
+
+        // Detect element size
+        var w, h;
+        w = (style.width != 'auto') ? style.width : element.offsetWidth;
+        h = (style.height != 'auto') ? style.height : element.offsetHeight;
+        w = (w) ? w : 'auto';
+        h = (h) ? h : 'auto';
+        container.style.width = w;
+        container.style.height = h;
     }
     // Opera, FF, Chrome
     else
@@ -248,11 +250,8 @@ function upclick(params)
     element.style.margin = 0;
 
     // element -> div
-    // clone element and remove original
-    var element2 = element.cloneNode(true);
-    container.appendChild(element2);
     element.parentNode.removeChild(element);
-    element = element2;
+    container.appendChild(element);
 
     // Move the input with the mouse to make sure it get clicked!
     var onmousemove_callback =
@@ -285,7 +284,4 @@ function upclick(params)
      // IE 5+
     else if (container.attachEvent)
         container.attachEvent("onmousemove", onmousemove_callback);
-    // IE 4
-    else
-        container.onmousemove = onmousemove_callback;
 }
