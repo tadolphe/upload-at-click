@@ -157,7 +157,7 @@ function upclick(params)
                     if (frame.contentWindow)
                         ifwin = frame.contentWindow;
                     // NN6, Konqueror
-                    else if (iframe.contentDocument)
+                    else if (frame.contentDocument)
                         ifwin = frame.contentDocument.defaultView;
 
                     // Run 'oncomplete' callback
@@ -208,6 +208,7 @@ function upclick(params)
     container.style.overflow = 'hidden';
     container.style.padding = 0;
     container.style.visiblity = 'hidden';
+    //container.style.float = element.style.float ? element.style.float : 'none';
 
     // margin
     // IE
