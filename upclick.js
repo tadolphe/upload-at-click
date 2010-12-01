@@ -68,7 +68,7 @@ function upclick(params)
             form.style.margin = 0;
             form.style.padding = 0;
             form.style.height = '80px';
-            form.style.width = '80px';
+            form.style.width = '40px';
 
             // append params in form
             var action_params = params['action_params'];
@@ -104,12 +104,13 @@ function upclick(params)
             input.style.top = 0;
             input.style.left = 0;
             input.style.height = form.style.height;
-            input.style.width = form.style.width;
+            input.style.width = '80px';
             input.style.opacity = 0;
             input.style.filter = 'alpha(opacity=0)';
             input.style.fontSize = 8;
             input.style.zIndex = 1;
             input.style.visiblity = 'hidden';
+            input.style.marginLeft = '-40px'; // hide IE text field
 
             // 'change' event handler. Submit form
             var onchange_callback =
@@ -181,7 +182,7 @@ function upclick(params)
                 {
                     var curleft = 0;
                     var curtop = 0;
-                    var obj = element.parentNode;
+                    var obj = element;
 
                     if (obj.offsetParent)
                     {
@@ -225,10 +226,7 @@ function upclick(params)
             e = window.event;
 
         container.style.display = 'none';
-        if (e.pageX)
-            var receiver = doc.elementFromPoint(e.pageX, e.pageY);
-        else
-            var receiver = doc.elementFromPoint(e.clientX, e.clientY);
+        var receiver = doc.elementFromPoint(e.clientX, e.clientY);
 
         if (receiver === element)
             container.style.display = 'block';
@@ -255,13 +253,13 @@ function upclick(params)
 
             if (e.pageX)
             {
-                container.style.left = e.pageX - x - 60 + 'px';
-                container.style.top = e.pageY - y - 40 + 'px';
+                container.style.left = e.pageX - 0 - 20 + 'px';
+                container.style.top = e.pageY - 0 - 40 + 'px';
             }
             else
             {
-                container.style.left = e.x - 60 + 'px';
-                container.style.top = e.y - 40 + 'px';
+                container.style.left = e.offsetX + x - 20 + 'px';
+                container.style.top = e.offsetY + y - 40 + 'px';
             }
 
             container.style.display = 'block';
