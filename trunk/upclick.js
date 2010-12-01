@@ -33,6 +33,9 @@ function upclick(params)
 
 
     var element = params['element'];
+    if (typeof element == 'string')
+        element = document.getElementById(element);
+
     var doc = element.ownerDocument;
     var input;
 
@@ -64,6 +67,8 @@ function upclick(params)
             form.setAttribute('action', params['action']);
             form.style.margin = 0;
             form.style.padding = 0;
+            form.style.height = '80px';
+            form.style.width = '80px';
 
             // append params in form
             var action_params = params['action_params'];
@@ -98,8 +103,8 @@ function upclick(params)
             input.style.display = 'block';
             input.style.top = 0;
             input.style.left = 0;
-            input.style.height = '80px';
-            input.style.width = '80px';
+            input.style.height = form.style.height;
+            input.style.width = form.style.width;
             input.style.opacity = 0;
             input.style.filter = 'alpha(opacity=0)';
             input.style.fontSize = 8;
@@ -201,58 +206,40 @@ function upclick(params)
     frame.marginWidth = 0;
 
     // container -> DOM
-    element.parentNode.insertBefore(container, element);
+    doc.body.insertBefore(container, doc.body.firstChild);
 
     // container style
-    container.style.position = 'relative';
+    container.style.position = 'absolute';
     container.style.overflow = 'hidden';
     container.style.padding = 0;
+    container.style.margin = 0;
     container.style.visiblity = 'hidden';
-    //container.style.float = element.style.float ? element.style.float : 'none';
+    container.style.display = 'none';
 
-    // margin
-    // IE
-    if (element.currentStyle && !doc.defaultView)
+
+    // If cursor out of element => shitch off listener
+    var onmouseout_callback =
+    function(e)
     {
-        var style = element.currentStyle;
-        container.style.marginTop = style.marginTop;
-        container.style.marginRight = style.marginRight;
-        container.style.marginBottom = style.marginBottom;
-        container.style.marginLeft = style.marginLeft;
+        if (!e)
+            e = window.event;
 
-        // Detect element size
-        var w, h;
-        w = (style.width != 'auto') ? style.width : element.offsetWidth;
-        h = (style.height != 'auto') ? style.height : element.offsetHeight;
-        w = (w) ? w : 'auto';
-        h = (h) ? h : 'auto';
-        container.style.width = w;
-        container.style.height = h;
-    }
-    // Opera, FF, Chrome
-    else
-    {
-        var style = doc.defaultView.getComputedStyle(element, '');
-        container.style.marginTop = style.getPropertyValue('margin-top');
-        container.style.marginRight = style.getPropertyValue('margin-right');
-        container.style.marginBottom = style.getPropertyValue('margin-bottom');
-        container.style.marginLeft = style.getPropertyValue('margin-left');
-        container.style.height =
-            element.offsetHeight +
-            parseInt(style.getPropertyValue('border-top-width')) +
-            parseInt(style.getPropertyValue('border-bottom-width')) +
-            'px';
-        container.style.width =
-            element.offsetWidth +
-            parseInt(style.getPropertyValue('border-left-width')) +
-            parseInt(style.getPropertyValue('border-right-width')) +
-            'px';
-    }
-    element.style.margin = 0;
+        container.style.display = 'none';
+        if (e.pageX)
+            var receiver = doc.elementFromPoint(e.pageX, e.pageY);
+        else
+            var receiver = doc.elementFromPoint(e.clientX, e.clientY);
 
-    // element -> div
-    element.parentNode.removeChild(element);
-    container.appendChild(element);
+        if (receiver === element)
+            container.style.display = 'block';
+    }
+    // DOM2: FF, Chrome, Opera
+    if (container.addEventListener)
+        container.addEventListener('mousemove', onmouseout_callback, false);
+     // IE 5+
+    else if (container.attachEvent)
+        container.attachEvent("onmousemove", onmouseout_callback);
+
 
     // Move the input with the mouse to make sure it get clicked!
     var onmousemove_callback =
@@ -268,21 +255,23 @@ function upclick(params)
 
             if (e.pageX)
             {
-                input.style.left = e.pageX - x - 60 + 'px';
-                input.style.top = e.pageY - y - 40 + 'px';
+                container.style.left = e.pageX - x - 60 + 'px';
+                container.style.top = e.pageY - y - 40 + 'px';
             }
             else
             {
-                input.style.left = e.x - 60 + 'px';
-                input.style.top = e.y - 40 + 'px';
+                container.style.left = e.x - 60 + 'px';
+                container.style.top = e.y - 40 + 'px';
             }
+
+            container.style.display = 'block';
         };
 
     // bind mousemove callback (for place button under cursor)
     // DOM2: FF, Chrome, Opera
-    if (container.addEventListener)
-        container.addEventListener('mousemove', onmousemove_callback, false);
+    if (element.addEventListener)
+        element.addEventListener('mousemove', onmousemove_callback, false);
      // IE 5+
-    else if (container.attachEvent)
-        container.attachEvent("onmousemove", onmousemove_callback);
+    else if (element.attachEvent)
+        element.attachEvent("onmousemove", onmousemove_callback);
 }
