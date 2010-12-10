@@ -6,6 +6,8 @@
  *      action:         Server script who receive file
  *      action_params:  Server script parameters. Array: key=value
  *      maxsize:        Maximum file size (in Bytes). 0 - unlimited
+ *      dataname:       File data name. Default: Filedata
+ *      zindex:         z-index listener
  *      onstart:        Callback function
  *                        onstart(filename).
  *                        Emited when file started upload
@@ -23,7 +25,9 @@ function upclick(params)
             action_params: {},
             maxsize: 0,
             onstart: null,
-            oncomplete: null
+            oncomplete: null,
+            dataname: 'Filedata',
+            zindex: 'auto'
         };
 
     for(var key in defaults)
@@ -45,7 +49,7 @@ function upclick(params)
     // frame -> div
     var frame_name = 'frame' + new Date().getTime().toString().substr(8);
 
-    // IE require such create method
+    // IE require such creation method
     container.innerHTML =
         '<iframe name="'+frame_name+'" src="about:blank" onload="this.onload_callback()"></iframe>';
     var frame = container.childNodes[0];
@@ -93,7 +97,7 @@ function upclick(params)
 
             // input -> form
             input = doc.createElement("input");
-            input.name='Filedata';
+            input.name=params['dataname'];
             input.type='file';
             input.size='1';
             form.appendChild(input);
@@ -111,6 +115,8 @@ function upclick(params)
             input.style.zIndex = 1;
             input.style.visiblity = 'hidden';
             input.style.marginLeft = '-40px'; // hide IE text field
+
+            // input click handler (enable container event listener)
 
             // 'change' event handler. Submit form
             var onchange_callback =
@@ -132,6 +138,7 @@ function upclick(params)
             // DOM2: FF, Opera, Chrome
             if (input.addEventListener)
                 input.addEventListener ('change', onchange_callback, false);
+
             // IE 5+
             else if (input.attachEvent)
             {
@@ -151,6 +158,7 @@ function upclick(params)
             // IE 4
             else
                 input.onpropertychange = onchange_callback;
+
 
             // Phase 2. Next 'onload' when data received from server
             frame.onload_callback =
@@ -215,7 +223,9 @@ function upclick(params)
     container.style.padding = 0;
     container.style.margin = 0;
     container.style.visiblity = 'hidden';
-    container.style.display = 'none';
+    container.style.width = '0px';
+    container.style.height = '0px';
+    container.style.zIndex = params['zindex'];
 
 
     // If cursor out of element => shitch off listener
@@ -225,11 +235,15 @@ function upclick(params)
         if (!e)
             e = window.event;
 
-        container.style.display = 'none';
+        container.style.width = '0px';
+        container.style.height = '0px';
         var receiver = doc.elementFromPoint(e.clientX, e.clientY);
 
         if (receiver === element)
-            container.style.display = 'block';
+        {
+            container.style.width = '40px';
+            container.style.height = '80px';
+        }
     }
     // DOM2: FF, Chrome, Opera
     if (container.addEventListener)
@@ -253,8 +267,8 @@ function upclick(params)
 
             if (e.pageX)
             {
-                container.style.left = e.pageX - 0 - 20 + 'px';
-                container.style.top = e.pageY - 0 - 40 + 'px';
+                container.style.left = e.pageX - 20 + 'px';
+                container.style.top = e.pageY - 40 + 'px';
             }
             else
             {
@@ -262,7 +276,8 @@ function upclick(params)
                 container.style.top = e.offsetY + y - 40 + 'px';
             }
 
-            container.style.display = 'block';
+            container.style.width = '40px';
+            container.style.height = '80px';
         };
 
     // bind mousemove callback (for place button under cursor)
