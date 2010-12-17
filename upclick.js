@@ -5,8 +5,9 @@
  *      element:        DOM object
  *      action:         Server script who receive file
  *      action_params:  Server script parameters. Array: key=value
- *      maxsize:        Maximum file size (in Bytes). 0 - unlimited
  *      dataname:       File data name. Default: Filedata
+ *      maxsize:        Maximum file size (in Bytes). 0 - unlimited
+ *      target:         Response target name: '_new', '_blank',... Default: <Hidden frame name>
  *      zindex:         z-index listener
  *      onstart:        Callback function
  *                        onstart(filename).
@@ -27,6 +28,7 @@ function upclick(params)
             onstart: null,
             oncomplete: null,
             dataname: 'Filedata',
+            target: null,
             zindex: 'auto'
         };
 
@@ -65,8 +67,16 @@ function upclick(params)
             form.method = 'post';
             form.enctype = 'multipart/form-data';
             form.encoding = 'multipart/form-data';
-            form.target = frame_name;
-            form.setAttribute('target', frame_name);
+            if (params['target'])
+            {
+                form.target = params['target'];
+                form.setAttribute('target', params['target']);
+            }
+            else
+            {
+                form.target = frame_name;
+                form.setAttribute('target', frame_name);
+            }
             form.action = params['action'];
             form.setAttribute('action', params['action']);
             form.style.margin = 0;
@@ -115,6 +125,7 @@ function upclick(params)
             input.style.zIndex = 1;
             input.style.visiblity = 'hidden';
             input.style.marginLeft = '-40px'; // hide IE text field
+            //input.style.cursor = 'pointer';
 
             // input click handler (enable container event listener)
 
@@ -183,28 +194,6 @@ function upclick(params)
                     // Clear filename
                     form.reset();
                 }
-
-            // Get input container position helper
-            input.findPos =
-                function()
-                {
-                    var curleft = 0;
-                    var curtop = 0;
-                    var obj = element;
-
-                    if (obj.offsetParent)
-                    {
-                        curleft = obj.offsetLeft;
-                        curtop = obj.offsetTop;
-
-                        while (obj = obj.offsetParent)
-                        {
-                            curleft += obj.offsetLeft;
-                            curtop += obj.offsetTop;
-                        }
-                    }
-                    return [curleft, curtop];
-                }
         };
 
     // frame style
@@ -225,8 +214,30 @@ function upclick(params)
     container.style.visiblity = 'hidden';
     container.style.width = '0px';
     container.style.height = '0px';
-    container.style.zIndex = params['zindex'];
+    //container.style.cursor = 'pointer'; // FIXME flashed on IE
 
+    // zindex detection
+    if (params['zindex'] == 'auto')
+    {
+        var zi=0, ziparsed;
+        var obj = element;
+        var comp;
+
+        while (obj.tagName != 'BODY')
+        {
+            comp = obj.currentStyle ? obj.currentStyle : getComputedStyle(obj, null);
+            ziparsed = parseInt(comp.zIndex);
+            ziparsed = isNaN(ziparsed) ? 0 : ziparsed;
+            zi += ziparsed + 1;
+            obj = obj.parentNode
+        }
+
+        container.style.zIndex = zi;
+    }
+    else
+    {
+        container.style.zIndex = params['zindex'];
+    }
 
     // If cursor out of element => shitch off listener
     var onmouseout_callback =
@@ -257,25 +268,32 @@ function upclick(params)
     var onmousemove_callback =
         function(e)
         {
-            var coords = input.findPos();
-            var x = coords[0];
-            var y = coords[1];
-
             // Get event details for IE
             if (!e)
                 e = window.event;
 
-            if (e.pageX)
-            {
-                container.style.left = e.pageX - 20 + 'px';
-                container.style.top = e.pageY - 40 + 'px';
-            }
-            else
-            {
-                container.style.left = e.offsetX + x - 20 + 'px';
-                container.style.top = e.offsetY + y - 40 + 'px';
-            }
+            // find element position,
+            var x = y = 0;
 
+            if (e.pageX)
+                x = e.pageX;
+            else if (e.clientX)
+               x = e.clientX +
+                (doc.documentElement.scrollLeft ?
+                    doc.documentElement.scrollLeft :
+                    doc.body.scrollLeft);
+
+            if (e.pageY)
+                y = e.pageY;
+            else if (e.clientY)
+               y = e.clientY +
+                    (doc.documentElement.scrollTop ?
+                        doc.documentElement.scrollTop :
+                        doc.body.scrollTop);
+
+            // move listener
+            container.style.left = x - 20 + 'px';
+            container.style.top = y - 40 + 'px';
             container.style.width = '40px';
             container.style.height = '80px';
         };
