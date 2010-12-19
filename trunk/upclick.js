@@ -83,6 +83,7 @@ function upclick(params)
             form.style.padding = 0;
             form.style.height = '80px';
             form.style.width = '40px';
+            form.runat = 'server';
 
             // append params in form
             var action_params = params['action_params'];
@@ -110,6 +111,7 @@ function upclick(params)
             input.name=params['dataname'];
             input.type='file';
             input.size='1';
+            input.runat = 'server';
             form.appendChild(input);
 
             // input style
