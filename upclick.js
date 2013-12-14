@@ -322,10 +322,9 @@ function upclick(params)
                 var evt = document.createEvent('MouseEvents');
                 evt.initEvent( 'mouseenter', true, false );
                 element.dispatchEvent(evt);
-
-                var evt = document.createEvent('MouseEvents');
-                evt.initEvent( 'mouseover', true, false );
-                element.dispatchEvent(evt);
+                var evt2 = document.createEvent('MouseEvents');
+                evt2.initEvent( 'mouseover', true, false );
+                element.dispatchEvent(evt2);
             } else if( document.createEventObject ) {
                 element.fireEvent('onmouseenter');
                 element.fireEvent('onmouseover');
