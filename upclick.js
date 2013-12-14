@@ -85,17 +85,6 @@ function upclick(params)
             form.style.width = '40px';
             form.runat = 'server';
 
-            // append params in form
-            var action_params = params['action_params'];
-            for(var key in action_params)
-            {
-                var hidden = doc.createElement("input");
-                hidden.type = "hidden";
-                hidden.name = key;
-                hidden.value = String(action_params[key]);
-                form.appendChild(hidden);
-            }
-
             // MAX_FILESIZE. Maximum file size
             if (params['maxsize'])
             {
@@ -139,8 +128,37 @@ function upclick(params)
                     if (!input.value)
                         return;
 
+                    // Action params
+                    // clear old
+                    for(var i=0; i < form.childNodes.length; i++) {
+                        var param_input = form.childNodes[i];
+
+                        if (param_input.is_action_params) {
+                            form.removeChild(param_input);
+                        }
+                    }
+
+                    // append params in form
+                    var action_params = params['action_params'];
+
+                    // if callable - get result
+                    if (typeof(action_params) == "function") {
+                        action_params = action_params();
+                    }
+
+                    for(var key in action_params)
+                    {
+                        var hidden = doc.createElement("input");
+                        hidden.type = "hidden";
+                        hidden.name = key;
+                        hidden.value = String(action_params[key]);
+                        hidden.is_action_params = true;
+                        form.appendChild(hidden);
+                    }
+
                     // Run onstart callback. When upload started
                     var onstart = params['onstart'];
+
                     if (onstart)
                         onstart(input.value);
 
@@ -308,3 +326,27 @@ function upclick(params)
     else if (element.attachEvent)
         element.attachEvent("onmousemove", onmousemove_callback);
 }
+/*
+(function(){
+
+    var methods = {
+        init : function( options ) { // THIS },
+        show : function( ) { // IS   },
+        hide : function( ) { // GOOD },
+        update : function( content ) { // !!! }};
+
+        $.fn.tooltip = function( method ) {
+
+            // Method calling logic
+            if ( methods[method] ) {
+                return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+            } else if ( typeof method === 'object' || ! method ) {
+                return methods.init.apply( this, arguments );
+            } else {
+                $.error( 'Method ' +  method + ' does not exist on jQuery.tooltip' );
+            }
+
+        };
+
+})();
+*/
