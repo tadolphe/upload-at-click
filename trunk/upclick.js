@@ -316,6 +316,20 @@ function upclick(params)
             container.style.top = y - 40 + 'px';
             container.style.width = '40px';
             container.style.height = '80px';
+
+            // hover on element
+            if( document.createEvent ) {
+                var evt = document.createEvent('MouseEvents');
+                evt.initEvent( 'mouseenter', true, false );
+                element.dispatchEvent(evt);
+
+                var evt = document.createEvent('MouseEvents');
+                evt.initEvent( 'mouseover', true, false );
+                element.dispatchEvent(evt);
+            } else if( document.createEventObject ) {
+                element.fireEvent('onmouseenter');
+                element.fireEvent('onmouseover');
+            }
         };
 
     // bind mousemove callback (for place button under cursor)
@@ -326,27 +340,3 @@ function upclick(params)
     else if (element.attachEvent)
         element.attachEvent("onmousemove", onmousemove_callback);
 }
-/*
-(function(){
-
-    var methods = {
-        init : function( options ) { // THIS },
-        show : function( ) { // IS   },
-        hide : function( ) { // GOOD },
-        update : function( content ) { // !!! }};
-
-        $.fn.tooltip = function( method ) {
-
-            // Method calling logic
-            if ( methods[method] ) {
-                return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
-            } else if ( typeof method === 'object' || ! method ) {
-                return methods.init.apply( this, arguments );
-            } else {
-                $.error( 'Method ' +  method + ' does not exist on jQuery.tooltip' );
-            }
-
-        };
-
-})();
-*/
